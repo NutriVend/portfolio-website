@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import Navigation from './components/Navigation';
 import Hero from './components/Hero';
 import Projects from './components/Projects';
@@ -10,6 +10,7 @@ import AdminDashboard from './components/pages/AdminDashboard';
 import ManageCategories from './components/ManageCategories';
 import PrivateRoute from './components/PrivateRoute';
 import Admin from './components/Admin';
+import AddProject from './components/AddProject';
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
                 </PrivateRoute>
               } 
             />
+            <Route path="/admin/add-project" element={<AddProject />} />
           </Routes>
         </div>
       </AuthProvider>

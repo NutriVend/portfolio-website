@@ -1,11 +1,12 @@
+import React from 'react';
 import { addProject, getCategories } from '../firebase/firestore';
 import AdminNav from './AdminNav';
 
-export default function AddProject() {
-    const [categories, setCategories] = useState([]);
-    const [selectedCategory, setSelectedCategory] = useState('');
+const AddProject = () => {
+    const [categories, setCategories] = React.useState([]);
+    const [selectedCategory, setSelectedCategory] = React.useState('');
 
-    useEffect(() => {
+    React.useEffect(() => {
         const fetchCategories = async () => {
             try {
                 const categoriesData = await getCategories();
@@ -60,4 +61,6 @@ export default function AddProject() {
             </div>
         </div>
     );
-} 
+};
+
+export default AddProject; 

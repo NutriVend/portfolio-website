@@ -15,7 +15,7 @@ export default function Admin() {
                     to="/admin/add-project" 
                     className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 text-center"
                 >
-                    Add New Project
+                    Add Project
                 </Link>
                 <Link 
                     to="/admin/categories" 
