@@ -10,6 +10,8 @@ const AddProject = () => {
     const [image, setImage] = useState(null);
     const [githubLink, setGithubLink] = useState('');
     const [liveLink, setLiveLink] = useState('');
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
 
     const handleImageChange = (e) => {
         if (e.target.files[0]) {
@@ -20,7 +22,7 @@ const AddProject = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         
-        if (!image || !title || !description || !category) {
+        if (!image || !title || !description || !category || !startDate || !endDate) {
             alert('Please fill in all required fields');
             return;
         }
@@ -39,6 +41,8 @@ const AddProject = () => {
                 imageUrl,
                 githubLink,
                 liveLink,
+                startDate,
+                endDate,
                 timestamp: new Date()
             });
 
@@ -49,6 +53,8 @@ const AddProject = () => {
             setImage(null);
             setGithubLink('');
             setLiveLink('');
+            setStartDate('');
+            setEndDate('');
             
             alert('Project added successfully!');
         } catch (error) {
@@ -58,29 +64,14 @@ const AddProject = () => {
     };
 
     return (
-        <div className="container mt-4">
-            <h2 className="mb-4">Add New Project</h2>
-            <form onSubmit={handleSubmit}>
-                <div className="mb-3">
-                    <label className="form-label">Project Title</label>
-                    <input
-                        type="text"
-                        className="form-control"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        required
-                    />
-                </div>
-
-                <div className="mb-3">
-                    <label className="form-label">Category</label>
-                    <select
-                        className="form-select"
-                        value={category}
-                        onChange={(e) => setCategory(e.target.value)}
-                        required
-                    >
-                        <option value="">Select a category</option>
+        <div className="add-project-container">
+            <h1>Add New Project</h1>
+            
+            <form className="project-form" onSubmit={handleSubmit}>
+                <div className="form-group">
+                    <label for="category">Category</label>
+                    <select id="category" name="category" value={category} onChange={(e) => setCategory(e.target.value)} required>
+                        <option value="Fitness">Fitness</option>
                         <option value="web">Web Development</option>
                         <option value="mobile">Mobile Development</option>
                         <option value="desktop">Desktop Applications</option>
@@ -88,18 +79,27 @@ const AddProject = () => {
                     </select>
                 </div>
 
-                <div className="mb-3">
-                    <label className="form-label">Description</label>
-                    <textarea
-                        className="form-control"
-                        rows="3"
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        required
-                    ></textarea>
+                <div className="form-group">
+                    <label for="projectName">Project Name</label>
+                    <input type="text" id="projectName" name="projectName" value={title} onChange={(e) => setTitle(e.target.value)} required />
                 </div>
 
-                <div className="mb-3">
+                <div className="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description" rows="4" value={description} onChange={(e) => setDescription(e.target.value)} required />
+                </div>
+
+                <div className="form-group">
+                    <label for="startDate">Start Date</label>
+                    <input type="date" id="startDate" name="startDate" value={startDate} onChange={(e) => setStartDate(e.target.value)} required />
+                </div>
+
+                <div className="form-group">
+                    <label for="endDate">End Date</label>
+                    <input type="date" id="endDate" name="endDate" value={endDate} onChange={(e) => setEndDate(e.target.value)} required />
+                </div>
+
+                <div className="form-group">
                     <label className="form-label">Project Image</label>
                     <input
                         type="file"
@@ -110,7 +110,7 @@ const AddProject = () => {
                     />
                 </div>
 
-                <div className="mb-3">
+                <div className="form-group">
                     <label className="form-label">GitHub Link</label>
                     <input
                         type="url"
@@ -121,7 +121,7 @@ const AddProject = () => {
                     />
                 </div>
 
-                <div className="mb-3">
+                <div className="form-group">
                     <label className="form-label">Live Demo Link</label>
                     <input
                         type="url"
@@ -132,12 +132,51 @@ const AddProject = () => {
                     />
                 </div>
 
-                <button type="submit" className="btn btn-primary">
-                    Add Project
-                </button>
+                <button type="submit" className="submit-btn">Create Project</button>
             </form>
         </div>
     );
 };
 
-export default AddProject; 
+export default AddProject;
+
+.add-project-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.project-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+label {
+  font-weight: 500;
+}
+
+input, select, textarea {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.submit-btn {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.submit-btn:hover {
+  background-color: #0056b3;
+} 
