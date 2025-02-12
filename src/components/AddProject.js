@@ -59,7 +59,7 @@ const AddProject = () => {
 
     return (
         <div className="container mt-4">
-            <h2 className="mb-4">Add New Project</h2>
+            <h2>Add New Project</h2>
             <form onSubmit={handleSubmit}>
                 <div className="mb-3">
                     <label className="form-label">Project Title</label>

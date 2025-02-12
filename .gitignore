@@ -8,6 +8,9 @@
 .env.test.local
 .env.production.local
 
+# production
+/build
+
 # misc
 .DS_Store 
 .vercel
