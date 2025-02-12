@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
+import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -14,10 +15,13 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Get Auth instance
-export const auth = getAuth(app);
+// Enable offline persistence
+const db = getFirestore(app);
 
-// Get Firestore instance
-export const db = getFirestore(app);
+// Initialize Auth
+const auth = getAuth(app);
 
+export const storage = getStorage(app);
+
+export { auth, db };
 export default app; 
