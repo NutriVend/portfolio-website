@@ -1,0 +1,36 @@
+/* Custom styles */
+
+/* Smooth scroll behavior */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Hover effects for project cards */
+.bg-white.rounded-lg.shadow-md {
+    transition: transform 0.2s ease-in-out;
+}
+
+.bg-white.rounded-lg.shadow-md:hover {
+    transform: translateY(-5px);
+}
+
+/* Link hover effects */
+.text-gray-700.hover\:text-gray-900 {
+    transition: color 0.2s ease-in-out;
+}
+
+/* Custom animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.text-center {
+    animation: fadeIn 1s ease-out;
+}
