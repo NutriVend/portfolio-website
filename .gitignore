@@ -1,15 +1,12 @@
-# dependencies
-/node_modules
-node_modules/
-
-# environment variables
+# Sensitive environment variables - never commit these files
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
-.env
-*.log
+
+# dependencies
+/node_modules
 
 # production
 /build
@@ -17,6 +14,5 @@ dist/
 build/
 
 # misc
-.DS_Store 
 .DS_Store
 .vercel

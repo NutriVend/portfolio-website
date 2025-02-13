@@ -3,12 +3,11 @@ import Navigation from './components/Navigation';
 import Hero from './components/Hero';
 import Projects from './components/Projects';
 import Contact from './components/Contact';
-import Login from './components/pages/Login';
+import Login from './components/Login';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
-import AdminDashboard from './components/pages/AdminDashboard';
+import AdminDashboard from './components/AdminDashboard';
 import ManageCategories from './components/ManageCategories';
-import Admin from './components/Admin';
 import AddProject from './components/AddProject';
 import Blog from './components/Blog';
 import BlogPost from './components/BlogPost';
@@ -33,7 +32,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/admin" element={
               <ProtectedRoute>
-                <Admin />
+                <AdminDashboard />
               </ProtectedRoute>
             } />
             <Route path="/admin/create-post" element={

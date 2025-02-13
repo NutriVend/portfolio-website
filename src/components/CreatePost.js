@@ -1,8 +1,6 @@
 import { useState } from 'react';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { db, storage } from '../firebase/config';
 import { useNavigate } from 'react-router-dom';
+import { databaseServices } from '../services/supabaseServices';
 
 export default function CreatePost() {
     const [title, setTitle] = useState('');
@@ -31,23 +29,20 @@ export default function CreatePost() {
         try {
             let coverImageUrl = '';
             if (coverImage) {
-                const imageRef = ref(storage, `blog-covers/${Date.now()}-${coverImage.name}`);
-                const snapshot = await uploadBytes(imageRef, coverImage);
-                coverImageUrl = await getDownloadURL(snapshot.ref);
+                coverImageUrl = await databaseServices.uploadFile(coverImage, 'blog-covers');
             }
 
             const readTime = calculateReadTime(content);
 
-            const docRef = await addDoc(collection(db, 'blog-posts'), {
+            await databaseServices.create('blog-posts', {
                 title,
                 content,
                 excerpt,
-                coverImage: coverImageUrl,
-                createdAt: serverTimestamp(),
-                readTime,
+                cover_image: coverImageUrl,
+                read_time: readTime,
             });
 
-            navigate(`/blog/${docRef.id}`);
+            navigate('/blog');
         } catch (error) {
             console.error('Error creating post:', error);
             alert('Failed to create post');

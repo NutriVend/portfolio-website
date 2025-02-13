@@ -1,49 +1,27 @@
 import { useState, useEffect } from 'react';
-import { getProjects, getCategories } from '../firebase/firestore';
-import { getDocs, collection } from 'firebase/firestore';
-import { db } from '../firebase/config';
+import { databaseServices } from '../services/supabaseServices';
 
 export default function Projects() {
-    const [projects, setProjects] = useState([]);
-    const [categories, setCategories] = useState([]);
+    const [projects, setProjects] = useState(null);
     const [selectedCategory, setSelectedCategory] = useState('all');
-    const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
     useEffect(() => {
         const fetchProjects = async () => {
             try {
-                const querySnapshot = await getDocs(collection(db, 'projects'));
-                const projectsData = querySnapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                }));
+                const projectsData = await databaseServices.getProjects();
                 setProjects(projectsData);
-                setLoading(false);
             } catch (error) {
                 console.error("Error fetching projects:", error);
                 setError('Failed to load projects');
-                setLoading(false);
             }
         };
-
         fetchProjects();
     }, []);
 
     const filteredProjects = selectedCategory === 'all'
         ? projects
-        : projects.filter(project => project.category === selectedCategory);
-
-    if (loading) {
-        return (
-            <div className="py-16 bg-gray-100">
-                <div className="max-w-6xl mx-auto px-4">
-                    <h2 className="text-3xl font-bold text-center mb-8">My Projects</h2>
-                    <div className="text-center">Loading projects...</div>
-                </div>
-            </div>
-        );
-    }
+        : projects?.filter(project => project.category === selectedCategory);
 
     if (error) {
         return (
@@ -56,6 +34,15 @@ export default function Projects() {
         );
     }
 
+    if (!projects || projects.length === 0) {
+        return (
+            <div className="container mx-auto px-4 py-8">
+                <h2 className="text-3xl font-bold mb-6">My Projects</h2>
+                <p className="text-center text-gray-600">Projects are on their way!</p>
+            </div>
+        );
+    }
+
     return (
         <div className="container mx-auto px-4 py-8">
             <h2 className="text-3xl font-bold mb-6">My Projects</h2>
@@ -64,7 +51,7 @@ export default function Projects() {
                 {projects.map((project) => (
                     <div key={project.id} className="bg-white rounded-lg shadow-md overflow-hidden">
                         <img 
-                            src={project.imageUrl || 'https://placehold.co/400x200'} 
+                            src={project.image_url || 'https://placehold.co/400x200'} 
                             alt={project.title}
                             className="w-full h-48 object-contain bg-gray-50"
                             onError={(e) => {
@@ -103,4 +90,4 @@ export default function Projects() {
             </div>
         </div>
     );
-} 
+}

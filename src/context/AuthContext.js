@@ -1,75 +1,51 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { auth } from '../firebase/config';
-import { onAuthStateChanged } from 'firebase/auth';
-import { loginWithEmail, logout, registerWithEmail, resetPassword } from '../firebase/auth';
+import { supabase } from '../config/supabase';
 
 const AuthContext = createContext();
 
-export const useAuth = () => {
+export function useAuth() {
     return useContext(AuthContext);
-};
+}
 
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            setUser(user);
+        // Get initial session
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            setUser(session?.user || null);
             setLoading(false);
         });
 
-        return unsubscribe;
+        // Listen for changes in auth state
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            setUser(session?.user || null);
+        });
+
+        return () => {
+            subscription?.unsubscribe();
+        };
     }, []);
 
     const login = async (email, password) => {
-        try {
-            setError('');
-            await loginWithEmail(email, password);
-        } catch (error) {
-            setError(error.message);
-            throw error;
-        }
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password
+        });
+        if (error) throw error;
+        return data;
     };
 
-    const signUp = async (email, password) => {
-        try {
-            setError('');
-            await registerWithEmail(email, password);
-        } catch (error) {
-            setError(error.message);
-            throw error;
-        }
-    };
-
-    const logoutUser = async () => {
-        try {
-            setError('');
-            await logout();
-        } catch (error) {
-            setError(error.message);
-            throw error;
-        }
-    };
-
-    const resetUserPassword = async (email) => {
-        try {
-            setError('');
-            await resetPassword(email);
-        } catch (error) {
-            setError(error.message);
-            throw error;
-        }
+    const logout = async () => {
+        const { error } = await supabase.auth.signOut();
+        if (error) throw error;
     };
 
     const value = {
         user,
         login,
-        signUp,
-        logoutUser,
-        resetUserPassword,
-        error
+        logout
     };
 
     return (
@@ -77,4 +53,4 @@ export function AuthProvider({ children }) {
             {!loading && children}
         </AuthContext.Provider>
     );
-} 
+}

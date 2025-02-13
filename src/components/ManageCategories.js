@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, addDoc, deleteDoc, doc, getDocs, serverTimestamp } from 'firebase/firestore';
-import { db } from '../firebase/config';
+import { databaseServices } from '../services/supabaseServices';
 
 export default function ManageCategories() {
     const [categories, setCategories] = useState([]);
@@ -12,12 +11,9 @@ export default function ManageCategories() {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const querySnapshot = await getDocs(collection(db, 'categories'));
-                const categoriesData = querySnapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                }));
-                setCategories(categoriesData);
+                const { data, error } = await databaseServices.getCollection('categories');
+                if (error) throw error;
+                setCategories(data);
             } catch (error) {
                 setError('Failed to fetch categories');
                 console.error('Error fetching categories:', error);
@@ -32,15 +28,13 @@ export default function ManageCategories() {
         if (!newCategory.trim()) return;
 
         try {
-            const docRef = await addDoc(collection(db, 'categories'), {
-                name: newCategory.trim(),
-                createdAt: serverTimestamp()
+            const { data, error } = await databaseServices.create('categories', {
+                name: newCategory.trim()
             });
             
-            setCategories([...categories, { 
-                id: docRef.id, 
-                name: newCategory.trim() 
-            }]);
+            if (error) throw error;
+
+            setCategories([...categories, data]);
             setNewCategory('');
             setSuccess('Category added successfully!');
             setTimeout(() => setSuccess(''), 3000);
@@ -54,7 +48,7 @@ export default function ManageCategories() {
     const handleDeleteCategory = async (categoryId) => {
         if (window.confirm('Are you sure you want to delete this category?')) {
             try {
-                await deleteDoc(doc(db, 'categories', categoryId));
+                await databaseServices.delete('categories', categoryId);
                 setCategories(categories.filter(cat => cat.id !== categoryId));
                 setSuccess('Category deleted successfully!');
                 setTimeout(() => setSuccess(''), 3000);
@@ -111,4 +105,4 @@ export default function ManageCategories() {
             </div>
         </div>
     );
-} 
+}
