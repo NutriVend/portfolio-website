@@ -18,6 +18,7 @@ export default function Navigation() {
                     <div className="flex items-center space-x-4">
                         <Link to="/#about" className="py-4 px-2 text-gray-700 hover:text-gray-900">About</Link>
                         <Link to="/#projects" className="py-4 px-2 text-gray-700 hover:text-gray-900">Projects</Link>
+                        <Link to="/blog" className="py-4 px-2 text-gray-700 hover:text-gray-900">Blog</Link>
                         <Link to="/#contact" className="py-4 px-2 text-gray-700 hover:text-gray-900">Contact</Link>
                         {user ? (
                             <>
@@ -37,4 +38,4 @@ export default function Navigation() {
             </div>
         </nav>
     );
-} 
+}

@@ -8,6 +8,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
 import AdminDashboard from './components/pages/AdminDashboard';
 import ManageCategories from './components/ManageCategories';
+import PrivateRoute from './components/PrivateRoute';
 import Admin from './components/Admin';
 import AddProject from './components/AddProject';
 import Blog from './components/Blog';
@@ -32,28 +33,27 @@ function App() {
             <Route path="/blog/:postId" element={<BlogPost />} />
             <Route path="/login" element={<Login />} />
             <Route path="/admin" element={
-              <ProtectedRoute>
+              <PrivateRoute>
                 <Admin />
-              </ProtectedRoute>
-            } />
-            <Route path="/admin/create-post" element={
-              <ProtectedRoute>
-                <CreatePost />
-              </ProtectedRoute>
+              </PrivateRoute>
             } />
             <Route 
               path="/admin/categories" 
               element={
-                <ProtectedRoute>
+                <PrivateRoute>
                   <ManageCategories />
-                </ProtectedRoute>
+                </PrivateRoute>
               } 
             />
-            <Route path="/admin/add-project" element={
-              <ProtectedRoute>
-                <AddProject />
-              </ProtectedRoute>
-            } />
+            <Route 
+              path="/admin/create-post" 
+              element={
+                <PrivateRoute>
+                  <CreatePost />
+                </PrivateRoute>
+              } 
+            />
+            <Route path="/admin/add-project" element={<AddProject />} />
           </Routes>
         </div>
       </AuthProvider>

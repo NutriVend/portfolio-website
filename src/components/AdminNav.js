@@ -18,6 +18,12 @@ const AdminNav = () => {
                         Add Project
                     </Link>
                     <Link 
+                        to="/admin/create-post"
+                        className="text-blue-500 hover:text-blue-700 font-medium"
+                    >
+                        Create Post
+                    </Link>
+                    <Link 
                         to="/admin/categories"
                         className="text-blue-500 hover:text-blue-700 font-medium"
                     >
@@ -29,4 +35,4 @@ const AdminNav = () => {
     );
 };
 
-export default AdminNav; 
+export default AdminNav;

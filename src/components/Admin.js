@@ -10,7 +10,7 @@ export default function Admin() {
             <p className="mb-6">Welcome, {user?.email}</p>
 
             {/* Admin Navigation Menu */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                 <Link 
                     to="/admin/add-new-project" 
                     className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 text-center"
@@ -18,8 +18,14 @@ export default function Admin() {
                     Add Project
                 </Link>
                 <Link 
-                    to="/admin/categories" 
+                    to="/admin/create-post" 
                     className="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 text-center"
+                >
+                    Create Blog Post
+                </Link>
+                <Link 
+                    to="/admin/categories" 
+                    className="bg-purple-500 text-white px-6 py-3 rounded-lg hover:bg-purple-600 text-center"
                 >
                     Manage Categories
                 </Link>
@@ -32,4 +38,4 @@ export default function Admin() {
             </div>
         </div>
     );
-} 
+}
