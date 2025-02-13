@@ -1,5 +1,6 @@
 # dependencies
 /node_modules
+node_modules/
 
 # environment variables
 .env
@@ -7,10 +8,15 @@
 .env.development.local
 .env.test.local
 .env.production.local
+.env
+*.log
 
 # production
 /build
+dist/
+build/
 
 # misc
 .DS_Store 
+.DS_Store
 .vercel
