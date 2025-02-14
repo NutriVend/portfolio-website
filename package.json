@@ -17,6 +17,7 @@
   "license": "ISC",
   "dependencies": {
     "@supabase/supabase-js": "^2.48.1",
+    "dotenv": "^16.4.7",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-markdown": "^9.0.3",

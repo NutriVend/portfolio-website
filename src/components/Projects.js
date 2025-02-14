@@ -49,7 +49,18 @@ export default function Projects() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {projects.map((project) => (
-                    <div key={project.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+                    <div 
+                        key={project.id} 
+                        className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer relative"
+                        onClick={() => project.live_link && window.open(project.live_link, '_blank', 'noopener,noreferrer')}
+                        role="button"
+                        tabIndex={0}
+                        onKeyPress={(e) => {
+                            if (e.key === 'Enter' && project.live_link) {
+                                window.open(project.live_link, '_blank', 'noopener,noreferrer');
+                            }
+                        }}
+                    >
                         <img 
                             src={project.image_url || 'https://placehold.co/400x200'} 
                             alt={project.title}
@@ -62,7 +73,7 @@ export default function Projects() {
                         <div className="p-4">
                             <h3 className="text-xl font-semibold mb-2">{project.title}</h3>
                             <p className="text-gray-600 mb-4">{project.description}</p>
-                            <div className="flex flex-wrap gap-2">
+                            <div className="flex flex-wrap gap-2 mb-4">
                                 {project.technologies && typeof project.technologies === 'string' ? 
                                     project.technologies.split(',').map((tech, index) => (
                                         <span 
@@ -83,6 +94,28 @@ export default function Projects() {
                                         ))
                                     : null
                                 }
+                            </div>
+                            <div className="flex gap-4 z-10 relative" onClick={e => e.stopPropagation()}>
+                                {project.live_link && (
+                                    <a 
+                                        href={project.live_link}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors duration-300 inline-flex items-center"
+                                    >
+                                        View Live
+                                    </a>
+                                )}
+                                {project.github_link && (
+                                    <a 
+                                        href={project.github_link}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="bg-gray-800 text-white px-4 py-2 rounded-md hover:bg-gray-900 transition-colors duration-300 inline-flex items-center"
+                                    >
+                                        GitHub
+                                    </a>
+                                )}
                             </div>
                         </div>
                     </div>

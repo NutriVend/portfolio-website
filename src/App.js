@@ -12,6 +12,7 @@ import AddProject from './components/AddProject';
 import Blog from './components/Blog';
 import BlogPost from './components/BlogPost';
 import CreatePost from './components/CreatePost';
+import EditPost from './components/EditPost';
 
 function App() {
   return (
@@ -38,6 +39,11 @@ function App() {
             <Route path="/admin/create-post" element={
               <ProtectedRoute>
                 <CreatePost />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/edit-post/:postId" element={
+              <ProtectedRoute>
+                <EditPost />
               </ProtectedRoute>
             } />
             <Route 

@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { databaseServices } from '../services/supabaseServices';
+import { useAuth } from '../context/AuthContext';
 
 export default function BlogPost() {
     const { postId } = useParams();
     const [post, setPost] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const { user } = useAuth();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchPost = async () => {
@@ -46,9 +49,37 @@ export default function BlogPost() {
     return (
         <article className="max-w-4xl mx-auto px-4 py-12">
             <header className="mb-8">
-                <h1 className="text-4xl md:text-5xl font-serif font-bold mb-6">
-                    {post.title}
-                </h1>
+                <div className="flex justify-between items-start mb-4">
+                    <h1 className="text-4xl md:text-5xl font-sans font-bold leading-tight">
+                        {post.title}
+                    </h1>
+                    {user && (
+                        <div className="flex gap-2">
+                            <Link
+                                to={`/admin/edit-post/${postId}`}
+                                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+                            >
+                                Edit Post
+                            </Link>
+                            <button
+                                onClick={async () => {
+                                    if (window.confirm('Are you sure you want to delete this post?')) {
+                                        try {
+                                            await databaseServices.delete('blog_posts', postId);
+                                            navigate('/blog');
+                                        } catch (error) {
+                                            console.error('Error deleting post:', error);
+                                            setError('Failed to delete post');
+                                        }
+                                    }
+                                }}
+                                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors"
+                            >
+                                Delete Post
+                            </button>
+                        </div>
+                    )}
+                </div>
                 
                 <div className="flex items-center space-x-4 mb-8">
                     <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
@@ -75,7 +106,7 @@ export default function BlogPost() {
                         <img 
                             src={post.cover_image} 
                             alt={post.title}
-                            className="w-full h-[400px] object-cover"
+                            className="w-full h-[400px] object-contain bg-gray-50"
                         />
                     </div>
                 )}

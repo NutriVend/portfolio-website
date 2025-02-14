@@ -60,7 +60,7 @@ export default function Blog() {
                                         <img 
                                             src={post.cover_image} 
                                             alt={post.title}
-                                            className="w-full h-48 object-cover transform hover:scale-105 transition-transform duration-300"
+                                            className="w-full h-48 object-contain bg-gray-50"
                                         />
                                     </div>
                                 </Link>
@@ -68,7 +68,7 @@ export default function Blog() {
                             
                             <div className="p-6">
                                 <Link to={`/blog/${post.id}`}>
-                                    <h2 className="text-2xl font-serif font-bold mb-3 hover:text-gray-700 transition-colors">
+                                    <h2 className="text-2xl font-sans font-bold mb-3 hover:text-gray-700 transition-colors">
                                         {post.title}
                                     </h2>
                                 </Link>

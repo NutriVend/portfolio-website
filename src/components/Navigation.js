@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export default function Navigation() {
-    const { user, logoutUser } = useAuth();
+    const { user, logout } = useAuth();
 
     return (
         <nav className="bg-white shadow-lg">
@@ -11,7 +11,16 @@ export default function Navigation() {
                     <div className="flex space-x-7">
                         <div>
                             <a href="https://app.nutrivend.xyz" target="_blank" rel="noopener noreferrer" className="flex items-center py-4">
-                                <span className="font-semibold text-gray-800 text-lg">NutriVend</span>
+                                <img 
+                                    src="/nutrivend-logo.png"
+                                    alt="NutriVend" 
+                                    className="h-8 w-auto"
+                                    onError={(e) => {
+                                        e.target.style.display = 'none';
+                                        const text = document.createTextNode('NutriVend');
+                                        e.target.parentNode.appendChild(text);
+                                    }}
+                                />
                             </a>
                         </div>
                     </div>
@@ -24,7 +33,7 @@ export default function Navigation() {
                             <>
                                 <Link to="/admin" className="py-4 px-2 text-gray-700 hover:text-gray-900">Admin</Link>
                                 <button 
-                                    onClick={logoutUser}
+                                    onClick={logout}
                                     className="py-2 px-4 bg-red-600 text-white rounded hover:bg-red-700"
                                 >
                                     Logout

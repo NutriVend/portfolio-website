@@ -209,5 +209,21 @@ export const databaseServices = {
     } catch (error) {
       throw new Error(`Failed to delete from ${table}: ${error.message}`);
     }
+  },
+
+  // Update
+  update: async (table, id, data) => {
+    try {
+      const { data: result, error } = await supabase
+        .from(table)
+        .update(data)
+        .eq('id', id)
+        .select();
+
+      if (error) throw error;
+      return result[0];
+    } catch (error) {
+      throw new Error(`Failed to update record in ${table}: ${error.message}`);
+    }
   }
 };
