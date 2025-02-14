@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { databaseServices } from '../services/supabaseServices';
+import { useAuth } from '../context/AuthContext';
 
 export default function CreatePost() {
     const [title, setTitle] = useState('');
@@ -9,6 +10,7 @@ export default function CreatePost() {
     const [coverImage, setCoverImage] = useState(null);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const { user } = useAuth();
 
     const handleImageChange = (e) => {
         if (e.target.files[0]) {
@@ -27,25 +29,41 @@ export default function CreatePost() {
         setLoading(true);
 
         try {
+            if (!user) {
+                throw new Error('You must be logged in to create a post');
+            }
+
             let coverImageUrl = '';
             if (coverImage) {
-                coverImageUrl = await databaseServices.uploadFile(coverImage, 'blog-covers');
+                try {
+                    coverImageUrl = await databaseServices.uploadFile(coverImage, 'blog-covers');
+                } catch (uploadError) {
+                    console.error('Upload error:', uploadError);
+                    throw new Error(`Failed to upload cover image: ${uploadError.message}`);
+                }
             }
 
             const readTime = calculateReadTime(content);
 
-            await databaseServices.create('blog-posts', {
+            const postData = {
                 title,
                 content,
                 excerpt,
                 cover_image: coverImageUrl,
                 read_time: readTime,
-            });
+                author_id: user.id,
+                created_at: new Date().toISOString()
+            };
+
+            console.log('Creating post with data:', postData);
+
+            const result = await databaseServices.create('blog_posts', postData);
+            console.log('Post created successfully:', result);
 
             navigate('/blog');
         } catch (error) {
             console.error('Error creating post:', error);
-            alert('Failed to create post');
+            alert(error.message || 'Failed to create post');
         } finally {
             setLoading(false);
         }
@@ -78,6 +96,7 @@ export default function CreatePost() {
                         required
                         rows={3}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        placeholder="A brief summary of your post"
                     />
                 </div>
 
@@ -103,6 +122,7 @@ export default function CreatePost() {
                         required
                         rows={15}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md font-mono"
+                        placeholder="Write your post content here (Markdown supported)"
                     />
                 </div>
 

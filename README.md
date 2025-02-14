@@ -1,31 +1,52 @@
 # My Developer Portfolio
 
-This is my personal portfolio website showcasing my projects and skills.
-<br> The link to the website:https://nutrivend.github.io/portfolio-website
+A modern portfolio website built with React, featuring blog capabilities, project showcase, and admin dashboard.
 
+## Live Demo
+https://nutrivend.github.io/portfolio-website
 
 ## Features
+- 🎨 Modern, responsive design
+- ✍️ Blog system with content management
+- 📁 Project showcase
+- 📊 Admin dashboard
+- 🔒 Protected routes with authentication
+- 🗃️ Supabase backend integration
 
-- Responsive design
-- Project showcase
-- Contact information
-- Skills display
+## Tech Stack
+- React.js
+- Tailwind CSS
+- Supabase
+- Firebase
 
 ## Setup
-
 1. Clone this repository
-2. Make your changes to the HTML and CSS files
-3. Push your changes to GitHub
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Create a `.env` file in the root directory with the following variables:
+   ```
+   REACT_APP_SUPABASE_URL=your_supabase_url
+   REACT_APP_SUPABASE_ANON_KEY=your_supabase_anon_key
+   REACT_APP_ADMIN_EMAIL=your_admin_email
+   ```
+4. Start the development server:
+   ```bash
+   npm start
+   ```
 
-## Customization
+## Development
+- `npm start` - Runs the app in development mode
+- `npm test` - Launches the test runner
+- `npm run build` - Builds the app for production
 
-To customize this portfolio:
-
-1. Update the content in `index.html`
-2. Add your own styles in `styles.css`
-3. Replace the placeholder images with your own project screenshots
-4. Update the contact links with your own social media profiles
+## Project Structure
+- `/src/components` - React components
+- `/src/context` - Context providers
+- `/src/services` - API and backend services
+- `/src/utils` - Utility functions
+- `/src/config` - Configuration files
 
 ## License
-
 Feel free to use this template for your own portfolio!

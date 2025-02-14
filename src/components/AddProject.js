@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import { databaseServices } from '../services/supabaseServices';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import './AddProject.css';
 
 const AddProject = () => {
+    const { user } = useAuth();
+    const navigate = useNavigate();
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [category, setCategory] = useState('');
@@ -24,6 +28,12 @@ const AddProject = () => {
         e.preventDefault();
         setLoading(true);
         
+        if (!user) {
+            setError('You must be logged in to add a project');
+            setLoading(false);
+            return;
+        }
+
         if (!image || !title || !description || !category || !startDate || !endDate) {
             setError('Please fill in all required fields');
             setLoading(false);
@@ -40,7 +50,8 @@ const AddProject = () => {
                 github_link: githubLink,
                 live_link: liveLink,
                 start_date: startDate,
-                end_date: endDate
+                end_date: endDate,
+                user_id: user.id // Add user_id to the project data
             });
 
             // Reset form

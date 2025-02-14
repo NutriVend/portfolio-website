@@ -53,23 +53,28 @@ export const databaseServices = {
   getCollection: async (path) => {
     try {
       const [table, id] = path.split('/');
+      console.log('Querying table:', table);
+      
       if (id) {
-        const { data, error } = await supabase
+        const response = await supabase
           .from(table)
           .select('*')
           .eq('id', id)
           .single();
-        if (error) throw error;
-        return data;
+        console.log('Single item response:', response);
+        if (response.error) throw response.error;
+        return { data: response.data };
       } else {
-        const { data, error } = await supabase
+        const response = await supabase
           .from(table)
           .select('*')
           .order('created_at', { ascending: false });
-        if (error) throw error;
-        return data;
+        console.log('Collection response:', response);
+        if (response.error) throw response.error;
+        return { data: response.data || [] };
       }
     } catch (error) {
+      console.error('Supabase query error:', error);
       throw new Error(`Failed to fetch from ${path}: ${error.message}`);
     }
   },
@@ -77,7 +82,9 @@ export const databaseServices = {
   // Projects specific operations
   createProject: async (projectData) => {
     try {
+      console.log('Project data being sent:', projectData);
       let imageUrl = null;
+      
       if (projectData.image) {
         const { data, error } = await storage
           .from('project-images')
@@ -95,8 +102,15 @@ export const databaseServices = {
       const { data, error } = await supabase
         .from('projects')
         .insert([{
-          ...projectData,
+          title: projectData.title,
+          description: projectData.description,
+          category: projectData.category,
           image_url: imageUrl,
+          github_link: projectData.github_link,
+          live_link: projectData.live_link,
+          start_date: projectData.start_date,
+          end_date: projectData.end_date,
+          user_id: projectData.user_id, // Add user_id to the insert
           created_at: new Date().toISOString()
         }])
         .select();
@@ -151,21 +165,35 @@ export const databaseServices = {
   },
 
   // File upload
-  uploadFile: async (file, bucket = 'project-images') => {
+  uploadFile: async (file, bucket = 'blog-covers') => {
+    if (!file) {
+        throw new Error('No file provided');
+    }
     try {
-      const { data, error } = await storage
-        .from(bucket)
-        .upload(`${Date.now()}-${file.name}`, file);
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Math.random()}-${Date.now()}.${fileExt}`;
+        const filePath = `${fileName}`;
 
-      if (error) throw error;
+        // Upload the file
+        const { data, error: uploadError } = await storage
+            .from(bucket)
+            .upload(filePath, file, {
+                cacheControl: '3600',
+                upsert: false,
+                contentType: file.type // Explicitly set the content type
+            });
+            
+        if (uploadError) throw uploadError;
 
-      const { data: { publicUrl } } = storage
-        .from(bucket)
-        .getPublicUrl(data.path);
+        // Get the public URL
+        const { data: { publicUrl } } = storage
+            .from(bucket)
+            .getPublicUrl(filePath);
 
-      return publicUrl;
+        return publicUrl;
     } catch (error) {
-      throw new Error(`Failed to upload file: ${error.message}`);
+        console.error('Upload error:', error);
+        throw new Error(`Failed to upload file: ${error.message}`);
     }
   },
 
