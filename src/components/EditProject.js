@@ -1,37 +1,47 @@
 import React, { useState, useEffect } from 'react';
 import { databaseServices } from '../services/supabaseServices';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
-import './AddProject.css';
+import { useNavigate, useParams } from 'react-router-dom';
 
-const AddProject = () => {
+const EditProject = () => {
+    const { projectId } = useParams();
     const { user } = useAuth();
     const navigate = useNavigate();
-    const [title, setTitle] = useState('');
+    const [name, setName] = useState('');
     const [description, setDescription] = useState('');
-    const [category, setCategory] = useState('');
-    const [categories, setCategories] = useState([]);
     const [image, setImage] = useState(null);
+    const [currentImage, setCurrentImage] = useState('');
     const [githubLink, setGithubLink] = useState('');
     const [liveLink, setLiveLink] = useState('');
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
+    const [displayOrder, setDisplayOrder] = useState(0);
     const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchCategories = async () => {
+        const fetchData = async () => {
             try {
-                const { data, error } = await databaseServices.getCollection('categories');
-                if (error) throw error;
-                setCategories(data || []);
+                const project = await databaseServices.getProject(projectId);
+                if (project) {
+                    setName(project.name);
+                    setDescription(project.description);
+                    setCurrentImage(project.image_url);
+                    setGithubLink(project.github_link || '');
+                    setLiveLink(project.live_link || '');
+                    setStartDate(project.start_date || '');
+                    setEndDate(project.end_date || '');
+                    setDisplayOrder(project.display_order || 0);
+                }
+                setLoading(false);
             } catch (error) {
-                console.error('Error fetching categories:', error);
-                setError('Failed to load categories');
+                console.error('Error fetching project:', error);
+                setError('Failed to load project');
+                setLoading(false);
             }
         };
-        fetchCategories();
-    }, []);
+        fetchData();
+    }, [projectId]);
 
     const handleImageChange = (e) => {
         if (e.target.files[0]) {
@@ -41,50 +51,34 @@ const AddProject = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
-        
-        if (!user) {
-            setError('You must be logged in to add a project');
-            setLoading(false);
-            return;
-        }
-
-        if (!image || !title || !description || !category || !startDate || !endDate) {
-            setError('Please fill in all required fields');
-            setLoading(false);
-            return;
-        }
+        setError('');
 
         try {
-            // Create project using Supabase service
-            await databaseServices.createProject({
-                title,
+            let projectImage = currentImage;
+            if (image) {
+                try {
+                    projectImage = await databaseServices.uploadFile(image, 'project-images');
+                } catch (uploadError) {
+                    console.error('Error uploading image:', uploadError);
+                    throw new Error('Failed to upload image: ' + uploadError.message);
+                }
+            }
+
+            const projectData = {
+                name,
                 description,
-                category_id: category, // Using the category ID from the select
-                image,
-                github_link: githubLink,
-                live_link: liveLink,
                 start_date: startDate,
                 end_date: endDate,
-                user_id: user.id
-            });
+                image_url: projectImage,
+                github_link: githubLink,
+                live_link: liveLink,
+                display_order: displayOrder
+            };
 
-            // Reset form
-            setTitle('');
-            setDescription('');
-            setCategory('');
-            setImage(null);
-            setGithubLink('');
-            setLiveLink('');
-            setStartDate('');
-            setEndDate('');
-            setError('');
-            navigate('/admin');
-        } catch (error) {
-            console.error('Error adding project: ', error);
-            setError('Error adding project. Please try again.');
-        } finally {
-            setLoading(false);
+            await databaseServices.updateProject(projectId, projectData);
+            navigate('/admin/projects');
+        } catch (err) {
+            setError('Failed to update project. Please try again.');
         }
     };
 
@@ -98,47 +92,18 @@ const AddProject = () => {
 
     return (
         <div className="container mx-auto px-4 py-8">
-            <h2 className="text-3xl font-bold mb-6">Add Project</h2>
+            <h2 className="text-3xl font-bold mb-6">Edit Project</h2>
             {error && <p className="text-red-600 mb-4">{error}</p>}
             <form onSubmit={handleSubmit} className="max-w-2xl mx-auto">
                 <div className="mb-4">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="category">
-                        Category *
-                    </label>
-                    <select 
-                        id="category" 
-                        name="category" 
-                        value={category} 
-                        onChange={(e) => setCategory(e.target.value)} 
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        required
-                    >
-                        <option value="">Select a category</option>
-                        {categories.map((cat) => (
-                            <option key={cat.id} value={cat.id}>
-                                {cat.name}
-                            </option>
-                        ))}
-                    </select>
-                    <div className="mt-2">
-                        <a 
-                            href="/admin/categories" 
-                            className="text-blue-500 hover:text-blue-700 text-sm"
-                        >
-                            Manage Categories
-                        </a>
-                    </div>
-                </div>
-
-                <div className="mb-4">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="title">
-                        Project Name
+                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
+                        Project Name *
                     </label>
                     <input
                         type="text"
-                        id="title"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
+                        id="name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                         required
                     />
@@ -146,7 +111,7 @@ const AddProject = () => {
 
                 <div className="mb-4">
                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="description">
-                        Description
+                        Description *
                     </label>
                     <textarea
                         id="description"
@@ -154,6 +119,19 @@ const AddProject = () => {
                         onChange={(e) => setDescription(e.target.value)}
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                         required
+                    />
+                </div>
+
+                <div className="mb-4">
+                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="displayOrder">
+                        Display Order
+                    </label>
+                    <input
+                        type="number"
+                        id="displayOrder"
+                        value={displayOrder}
+                        onChange={(e) => setDisplayOrder(parseInt(e.target.value))}
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                     />
                 </div>
 
@@ -167,7 +145,6 @@ const AddProject = () => {
                         value={startDate}
                         onChange={(e) => setStartDate(e.target.value)}
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        required
                     />
                 </div>
 
@@ -181,7 +158,6 @@ const AddProject = () => {
                         value={endDate}
                         onChange={(e) => setEndDate(e.target.value)}
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        required
                     />
                 </div>
 
@@ -189,12 +165,20 @@ const AddProject = () => {
                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="image">
                         Project Image
                     </label>
+                    {currentImage && (
+                        <div className="mb-2">
+                            <img 
+                                src={currentImage} 
+                                alt="Current project" 
+                                className="h-32 object-contain"
+                            />
+                        </div>
+                    )}
                     <input
                         type="file"
                         id="image"
                         onChange={handleImageChange}
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        required
                     />
                 </div>
 
@@ -231,11 +215,11 @@ const AddProject = () => {
                     className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
                     disabled={loading}
                 >
-                    {loading ? 'Creating Project...' : 'Create Project'}
+                    {loading ? 'Saving Changes...' : 'Save Changes'}
                 </button>
             </form>
         </div>
     );
 };
 
-export default AddProject;
+export default EditProject;

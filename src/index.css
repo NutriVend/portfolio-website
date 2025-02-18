@@ -1,3 +1,53 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 @tailwind base; /* Tailwind CSS base styles */
 @tailwind components; /* Tailwind CSS component styles */
 @tailwind utilities; /* Tailwind CSS utility styles */
+
+/* Base styles with increased specificity */
+html, body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+/* Updated image styles */
+img {
+  max-width: 100% !important;
+  height: auto !important;
+}
+
+/* Category image specific styles */
+.h-48 img {
+  width: auto !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+  background-color: rgb(249 250 251) !important; /* light gray background */
+}
+
+/* Category image specific styles */
+.h-64 img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  background-color: rgb(249 250 251) !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+}
+
+/* Container specific image styles */
+.aspect-w-16.aspect-h-9 img,
+[class*='aspect-'] img {
+  width: auto !important;
+  max-width: 100% !important;
+  height: auto !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+}
+
+/* Additional responsive image handling */
+@media screen and (max-width: 768px) {
+  img {
+    max-height: 80vh !important;
+  }
+}

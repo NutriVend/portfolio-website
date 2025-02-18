@@ -1,68 +1,58 @@
-import { HashRouter as Router, Routes, Route } from 'react-router-dom';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navigation from './components/Navigation';
-import Hero from './components/Hero';
 import Projects from './components/Projects';
+import AboutMe from './components/AboutMe';
 import Contact from './components/Contact';
 import Login from './components/Login';
+import AdminDashboard from './components/AdminDashboard';
+import AddProject from './components/AddProject';
+import EditProject from './components/EditProject';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
-import AdminDashboard from './components/AdminDashboard';
-import ManageCategories from './components/ManageCategories';
-import AddProject from './components/AddProject';
-import Blog from './components/Blog';
-import BlogPost from './components/BlogPost';
-import CreatePost from './components/CreatePost';
-import EditPost from './components/EditPost';
 
 function App() {
   return (
-    <Router>
-      <AuthProvider>
-        <div className="bg-gray-100">
+    <AuthProvider>
+      <Router>
+        <div className="min-h-screen bg-gray-50">
           <Navigation />
           <Routes>
-            <Route path="/" element={
-              <>
-                <Hero />
-                <Projects />
-                <Contact />
-              </>
-            } />
-            <Route path="/blog" element={<Blog />} />
-            <Route path="/blog/:postId" element={<BlogPost />} />
+            <Route path="/" element={<Projects />} />
+            <Route path="/about" element={<AboutMe />} />
+            <Route path="/projects" element={<Projects />} />
+            <Route path="/contact" element={<Contact />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/admin" element={
-              <ProtectedRoute>
-                <AdminDashboard />
-              </ProtectedRoute>
-            } />
-            <Route path="/admin/create-post" element={
-              <ProtectedRoute>
-                <CreatePost />
-              </ProtectedRoute>
-            } />
-            <Route path="/admin/edit-post/:postId" element={
-              <ProtectedRoute>
-                <EditPost />
-              </ProtectedRoute>
-            } />
-            <Route 
-              path="/admin/categories" 
+            
+            {/* Admin Routes */}
+            <Route
+              path="/admin/dashboard"
               element={
                 <ProtectedRoute>
-                  <ManageCategories />
+                  <AdminDashboard />
                 </ProtectedRoute>
-              } 
+              }
             />
-            <Route path="/admin/add-project" element={
-              <ProtectedRoute>
-                <AddProject />
-              </ProtectedRoute>
-            } />
+            <Route
+              path="/admin/add-project"
+              element={
+                <ProtectedRoute>
+                  <AddProject />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/edit-project/:projectId"
+              element={
+                <ProtectedRoute>
+                  <EditProject />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </div>
-      </AuthProvider>
-    </Router>
+      </Router>
+    </AuthProvider>
   );
 }
 

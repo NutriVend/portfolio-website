@@ -1,8 +1,30 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { databaseServices } from '../services/supabaseServices';
 
 export default function Navigation() {
     const { user, logout } = useAuth();
+    const [projects, setProjects] = useState([]);
+    const [error, setError] = useState('');
+
+    useEffect(() => {
+        const initAndFetchProjects = async () => {
+            try {
+                await databaseServices.initializeTables();
+                const { data } = await databaseServices.getCollection('projects');
+                const sortedData = data ? [...data].sort((a, b) => 
+                    (a.display_order ?? Infinity) - (b.display_order ?? Infinity)
+                ) : [];
+                setProjects(sortedData);
+            } catch (error) {
+                console.error('Error fetching projects:', error);
+                setError(error.message);
+            }
+        };
+
+        initAndFetchProjects();
+    }, []);
 
     return (
         <nav className="bg-white shadow-lg">
@@ -10,37 +32,30 @@ export default function Navigation() {
                 <div className="flex justify-between">
                     <div className="flex space-x-7">
                         <div>
-                            <a href="https://app.nutrivend.xyz" target="_blank" rel="noopener noreferrer" className="flex items-center py-4">
-                                <img 
-                                    src="/nutrivend-logo.png"
-                                    alt="NutriVend" 
-                                    className="h-8 w-auto"
-                                    onError={(e) => {
-                                        e.target.style.display = 'none';
-                                        const text = document.createTextNode('NutriVend');
-                                        e.target.parentNode.appendChild(text);
-                                    }}
-                                />
-                            </a>
+                            <Link to="/" className="flex items-center py-4">
+                                <span className="font-semibold text-gray-500 text-lg">Portfolio</span>
+                            </Link>
+                        </div>
+                        <div className="hidden md:flex items-center space-x-1">
+                            <Link to="/" className="py-4 px-2 text-gray-500 hover:text-blue-500 transition duration-300">Home</Link>
+                            <Link to="/about" className="py-4 px-2 text-gray-500 hover:text-blue-500 transition duration-300">About</Link>
+                            <Link to="/projects" className="py-4 px-2 text-gray-500 hover:text-blue-500 transition duration-300">Projects</Link>
+                            <Link to="/contact" className="py-4 px-2 text-gray-500 hover:text-blue-500 transition duration-300">Contact</Link>
+                            {user && (
+                                <Link to="/admin/dashboard" className="py-4 px-2 text-gray-500 hover:text-blue-500 transition duration-300">Admin</Link>
+                            )}
                         </div>
                     </div>
-                    <div className="flex items-center space-x-4">
-                        <Link to="/#about" className="py-4 px-2 text-gray-700 hover:text-gray-900">About</Link>
-                        <Link to="/#projects" className="py-4 px-2 text-gray-700 hover:text-gray-900">Projects</Link>
-                        <Link to="/blog" className="py-4 px-2 text-gray-700 hover:text-gray-900">Blog</Link>
-                        <Link to="/#contact" className="py-4 px-2 text-gray-700 hover:text-gray-900">Contact</Link>
+                    <div className="hidden md:flex items-center space-x-3">
                         {user ? (
-                            <>
-                                <Link to="/admin" className="py-4 px-2 text-gray-700 hover:text-gray-900">Admin</Link>
-                                <button 
-                                    onClick={logout}
-                                    className="py-2 px-4 bg-red-600 text-white rounded hover:bg-red-700"
-                                >
-                                    Logout
-                                </button>
-                            </>
+                            <button
+                                onClick={logout}
+                                className="py-2 px-4 text-gray-500 hover:text-blue-500 transition duration-300"
+                            >
+                                Logout
+                            </button>
                         ) : (
-                            <Link to="/login" className="py-2 px-4 bg-blue-600 text-white rounded hover:bg-blue-700">Login</Link>
+                            <Link to="/login" className="py-2 px-4 text-gray-500 hover:text-blue-500 transition duration-300">Login</Link>
                         )}
                     </div>
                 </div>
