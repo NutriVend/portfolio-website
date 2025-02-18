@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { databaseServices } from '../services/supabaseServices';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import { sanitizeHtml } from '../utils/storage';
 
 export default function ManageHero() {
     const [heroContent, setHeroContent] = useState({
@@ -40,12 +41,21 @@ export default function ManageHero() {
         setLoading(true);
         setError('');
         try {
+            // Sanitize content before saving
+            const sanitizedContent = {
+                ...heroContent,
+                title: sanitizeHtml(heroContent.title),
+                subtitle: sanitizeHtml(heroContent.subtitle),
+                // Video URLs are whitelisted to known providers in the database
+                videoUrl: heroContent.videoUrl
+            };
+
             let result;
             if (heroContent.id) {
-                result = await databaseServices.update('hero_content', heroContent.id, heroContent);
+                result = await databaseServices.update('hero_content', heroContent.id, sanitizedContent);
             } else {
                 result = await databaseServices.create('hero_content', {
-                    ...heroContent,
+                    ...sanitizedContent,
                     created_at: new Date().toISOString()
                 });
             }

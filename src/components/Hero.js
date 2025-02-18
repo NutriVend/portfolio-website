@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { databaseServices } from '../services/supabaseServices';
+import { sanitizeHtml } from '../utils/storage';
 
 export default function Hero() {
     const [heroContent, setHeroContent] = useState({
@@ -18,18 +19,28 @@ export default function Hero() {
                 if (error) throw error;
                 
                 if (data && data.length > 0) {
-                    setHeroContent(data[0]);
+                    const content = data[0];
+                    setHeroContent({
+                        ...content,
+                        title: sanitizeHtml(content.title),
+                        subtitle: sanitizeHtml(content.subtitle),
+                    });
                 } else {
                     // If no content exists, try to initialize and fetch again
                     await databaseServices.initializeTables();
                     const { data: newData } = await databaseServices.getCollection('hero_content');
                     if (newData && newData.length > 0) {
-                        setHeroContent(newData[0]);
+                        const content = newData[0];
+                        setHeroContent({
+                            ...content,
+                            title: sanitizeHtml(content.title),
+                            subtitle: sanitizeHtml(content.subtitle),
+                        });
                     } else {
                         // If still no content, use default values
                         setHeroContent({
-                            title: "Hi, I'm Woosik",
-                            subtitle: "Mechanical Engineer, Bodybuilder, Fitness Coach, Software Developer, DIY & 3D printing Enthusiast, Problem Solver",
+                            title: sanitizeHtml("Hi, I'm Woosik"),
+                            subtitle: sanitizeHtml("Mechanical Engineer, Bodybuilder, Fitness Coach, Software Developer, DIY & 3D printing Enthusiast, Problem Solver"),
                             videoUrl: ""
                         });
                     }
@@ -38,8 +49,8 @@ export default function Hero() {
                 console.error('Error fetching hero content:', error);
                 // Use default values on error
                 setHeroContent({
-                    title: "Hi, I'm Woosik",
-                    subtitle: "Mechanical Engineer, Bodybuilder, Fitness Coach, Software Developer, DIY & 3D printing Enthusiast, Problem Solver",
+                    title: sanitizeHtml("Hi, I'm Woosik"),
+                    subtitle: sanitizeHtml("Mechanical Engineer, Bodybuilder, Fitness Coach, Software Developer, DIY & 3D printing Enthusiast, Problem Solver"),
                     videoUrl: ""
                 });
                 setError(error.message);
@@ -50,6 +61,23 @@ export default function Hero() {
 
         fetchHeroContent();
     }, []);
+
+    const isValidVideoUrl = (url) => {
+        if (!url) return false;
+        try {
+            const validDomains = [
+                'youtube.com',
+                'www.youtube.com',
+                'youtu.be',
+                'vimeo.com',
+                'player.vimeo.com'
+            ];
+            const urlObj = new URL(url);
+            return validDomains.some(domain => urlObj.hostname === domain);
+        } catch {
+            return false;
+        }
+    };
 
     if (loading) {
         return (
@@ -78,8 +106,8 @@ export default function Hero() {
                         className="mt-4 text-l text-gray-600"
                         dangerouslySetInnerHTML={{ __html: heroContent.subtitle || "Mechanical Engineer, Bodybuilder, Fitness Coach, Software Developer, DIY & 3D printing Enthusiast, Problem Solver" }}
                     />
-                    {heroContent.videoUrl && (
-                        <div className="mt-8 max-w-3xl mx-auto">
+                    {heroContent.videoUrl && isValidVideoUrl(heroContent.videoUrl) && (
+                        <div className="mt-8 max-w-3xl mx-auto"></div>
                             <div className="aspect-w-16 aspect-h-9 rounded-lg overflow-hidden shadow-lg">
                                 <iframe
                                     src={heroContent.videoUrl}
@@ -91,7 +119,7 @@ export default function Hero() {
                             </div>
                         </div>
                     )}
-                    <div className="mt-6 flex justify-center space-x-6">
+                    <div className="mt-6 flex justify-center space-x-6"></div>
                         <a href="https://github.com/NutriVend" target="_blank" rel="noopener noreferrer" className="text-gray-700 hover:text-gray-900">
                             <i className="fab fa-github mr-2"></i>GitHub
                         </a>
