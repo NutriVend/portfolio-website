@@ -1,33 +1,60 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { databaseServices } from '../services/supabaseServices';
 
 export default function Blog() {
+    const { categoryId } = useParams();
     const [posts, setPosts] = useState([]);
+    const [category, setCategory] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
     useEffect(() => {
-        const fetchPosts = async () => {
+        const fetchData = async () => {
             try {
-                console.log('Fetching posts...');
-                const response = await databaseServices.getCollection('blog_posts');
-                console.log('Fetched posts response:', response);
-                if (response.data) {
-                    setPosts(response.data);
+                setLoading(true);
+                let response;
+                
+                if (categoryId) {
+                    const [postsResponse, categoryResponse] = await Promise.all([
+                        databaseServices.getCollection('blog_posts'),
+                        databaseServices.getCollection(`categories/${categoryId}`)
+                    ]);
+                    
+                    if (!categoryResponse.data) {
+                        setError('Category not found');
+                        return;
+                    }
+
+                    setCategory(categoryResponse.data);
+                    
+                    // More explicit data validation
+                    if (!postsResponse.data || !Array.isArray(postsResponse.data)) {
+                        setError('Failed to load blog posts');
+                        return;
+                    }
+
+                    const filteredPosts = postsResponse.data.filter(post => post.category_id === categoryId);
+                    setPosts(filteredPosts);
                 } else {
-                    console.error('No data received from getCollection');
-                    setError('Failed to load blog posts');
+                    // Fetch all posts if no category is specified
+                    response = await databaseServices.getCollection('blog_posts');
+                    if (!response.data || !Array.isArray(response.data)) {
+                        setError('Failed to load blog posts');
+                        return;
+                    }
+                    setPosts(response.data);
                 }
             } catch (error) {
-                console.error('Error fetching posts:', error);
-                setError('Failed to load blog posts');
+                console.error('Error fetching data:', error);
+                setError('Failed to load content');
             } finally {
                 setLoading(false);
             }
         };
-        fetchPosts();
-    }, []);
+        
+        fetchData();
+    }, [categoryId]);
 
     if (loading) {
         return (
@@ -43,11 +70,13 @@ export default function Blog() {
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <h1 className="text-4xl font-serif font-bold mb-12 text-center">Latest Stories</h1>
+            <h1 className="text-4xl font-serif font-bold mb-12 text-center">
+                {category ? `Posts in ${category.name}` : 'Latest Stories'}
+            </h1>
             
             {posts.length === 0 ? (
                 <div className="text-center text-gray-600 py-12">
-                    <p className="text-xl">No stories published yet.</p>
+                    <p className="text-xl">No stories published {category ? 'in this category' : 'yet'}.</p>
                     <p className="mt-2">Check back soon for amazing content.</p>
                 </div>
             ) : (
